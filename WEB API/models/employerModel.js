@@ -29,7 +29,15 @@ const employerSchema = new mongoose.Schema({
     jobsPosted: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'jobs'
-    }]
+    }],
+    passwordHistory: {
+        type: [String],
+        default: []
+    },
+    passwordUpdatedAt: {
+        type: Date,
+        default: Date.now
+    },
 }, {
     timestamps: true
 });

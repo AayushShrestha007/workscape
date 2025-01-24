@@ -216,7 +216,7 @@ const UpdateEmployerProfile = () => {
         formData.append('organizationAddress', organizationAddress);
         formData.append('email', email);
         formData.append('phone', phone);
-        formData.append('password', password);
+        formData.append('newPassword', password);
         if (employerImage) {
             formData.append('employerImage', employerImage);
         }
@@ -235,8 +235,8 @@ const UpdateEmployerProfile = () => {
                 toast.error(response.data.message);
             }
         } catch (error) {
-            console.error('Error updating profile:', error);
-            toast.error('Error updating profile');
+            const errorMessage = error.response?.data?.message || 'Error updating profile';
+            toast.error(errorMessage); // Show the actual error message or a fallback
         }
     };
 
