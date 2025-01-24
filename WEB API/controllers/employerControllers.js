@@ -204,9 +204,34 @@ const updateEmployer = async (req, res) => {
             req.body.employerImage = imageName;
         }
 
-        if (req.body.password) {
+        if (req.body.newPassword) {
+
+            const newPassword = req.body.newPassword;
+
+            // Check if the new password matches any in the password history
+            for (const oldHash of employer.passwordHistory) {
+                const isMatch = await bcrypt.compare(newPassword, oldHash);
+                if (isMatch) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "You cannot reuse a recent password.",
+                    });
+                }
+            }
+
             const randomSalt = await bcrypt.genSalt(10);
-            req.body.password = await bcrypt.hash(req.body.password, randomSalt);
+            const hashedPassword = await bcrypt.hash(newPassword, randomSalt);
+            req.body.password = hashedPassword;
+
+            // Update password history
+            employer.passwordHistory.push(employer.password); // Add current password to history
+            employer.passwordUpdatedAt = new Date(); // Update the password timestamp
+
+            // Keep only the last 5 passwords in the history
+            if (employer.passwordHistory.length > 5) {
+                employer.passwordHistory.shift(); // Remove the oldest password
+            }
+
         }
 
         const updatedEmployer = await employerModel.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true, runValidators: true });
@@ -225,6 +250,8 @@ const updateEmployer = async (req, res) => {
         });
     }
 };
+
+
 
 //Exporting the function 
 module.exports = {
