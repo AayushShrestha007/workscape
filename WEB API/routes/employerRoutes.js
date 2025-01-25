@@ -12,4 +12,8 @@ router.post("/login", employerControllers.login)
 //Creationg employer update route
 router.put("/update_employer/:id", employerControllers.updateEmployer)
 
+
+//Creating password update route for employer
+router.post("/update_password_employer/:id", employerControllers.updatePassword)
+
 module.exports = router;

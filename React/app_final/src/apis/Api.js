@@ -26,6 +26,9 @@ export const registerUserApi = (data) => Api.post("/api/user/register", data)
 //updateApplicantProfile API
 export const updateApplicantProfile = (id, data) => Api.put(`/api/user/update_applicant/${id}`, data, config)
 
+//updateApplicant password API
+export const updateApplicantPassword = (id, data) => Api.post(`/api/user/update_password/${id}`, data, config)
+
 //Resume creation API
 export const createResumeApi = (data) => Api.post("/api/resume/create_resume", data, config)
 
@@ -40,10 +43,12 @@ export const registerEmployerApi = (data) => Api.post("/api/employer/register", 
 //create job API
 export const createJobApi = (data) => Api.post("/api/job/create_job", data, config)
 
-//updateApplicantProfile API
+//update Employer Profile API
 export const updateEmployerProfile = (id, data) => Api.put(`/api/employer/update_employer/${id}`, data, config)
 
-export const updatePassword = (id, data) => Api.post(`/api/employer/update_password/${id}`, data, config)
+//updateApplicantProfile API
+export const updateEmployerPassword = (id, data) => Api.post(`/api/employer/update_password_employer/${id}`, data, config)
+
 
 //fetch all open job by employer API
 export const getAllOpenJobByEmployerApi = (page, limit) => Api.get(`/api/job/open_jobs_by_employer?page=${page}&limit=${limit}`, config)

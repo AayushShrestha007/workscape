@@ -77,6 +77,8 @@ const register = async (req, res) => {
             phone: phone,
             password: hashedPassword,
             employerImage: imageName,
+            passwordHistory: [hashedPassword],
+            passwordUpdatedAt: new Date(),
         })
 
         //save to database
@@ -134,6 +136,7 @@ const login = async (req, res) => {
             })
         }
 
+
         //compare password
         const isValidPassword = await bcrypt.compare(password, findemployer.password)
 
@@ -142,6 +145,14 @@ const login = async (req, res) => {
                 "success": false,
                 "message": "Password doesn't match"
             })
+        }
+
+        const passwordExpiryDays = 90;
+        const currentDate = new Date();
+        const passwordAge = Math.floor((currentDate - findemployer.passwordUpdatedAt) / (1000 * 60 * 60 * 24));
+
+        if (passwordAge > passwordExpiryDays) {
+            return res.status(403).json({ message: "Your password has expired. Please update it." });
         }
 
         //token (Generate- employer data + key)
@@ -251,11 +262,65 @@ const updateEmployer = async (req, res) => {
     }
 };
 
+const updatePassword = async (req, res) => {
+    const { employerId, newPassword } = req.body;
+
+    try {
+        const employer = await employerModel.findById(employerId);
+        if (!employer) {
+            return res.status(404).json({
+                success: false,
+                message: "Employer not found"
+            });
+        }
+
+        // Check if the new password matches any in the password history
+        for (const oldHash of employer.passwordHistory) {
+            const isMatch = await bcrypt.compare(newPassword, oldHash);
+            if (isMatch) {
+                return res.status(400).json({
+                    success: false,
+                    message: "You cannot reuse a recent password."
+                });
+            }
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the password and add the old one to the history
+        employer.passwordHistory.push(employer.password); // Add current password to history
+        employer.password = hashedPassword;
+
+        // Update the passwordUpdatedAt field
+        employer.passwordUpdatedAt = new Date();
+
+        // Keep only the last 5 passwords in the history
+        if (employer.passwordHistory.length > 5) {
+            employer.passwordHistory.shift(); // Remove the oldest password
+        }
+
+        // Save the updated employer data
+        await employer.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Password updated successfully."
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
+};
 
 
 //Exporting the function 
 module.exports = {
     register,
     login,
-    updateEmployer
+    updateEmployer,
+    updatePassword
 };
