@@ -162,8 +162,17 @@ const login = async (req, res) => {
                 id: findemployer._id,
                 role: "employer"
             },
-            process.env.JWT_SECRET
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+
         )
+
+        res.cookie('session', token, {
+            httpOnly: true, // Prevent client-side scripts from accessing the cookie
+            secure: true,
+            sameSite: 'None', // Prevent cross-site cookie usage
+            maxAge: 3600000, // 1 hour in milliseconds
+        });
 
         //5.1 If login successful send response
         //5.1.1 stop the process
@@ -317,10 +326,21 @@ const updatePassword = async (req, res) => {
 };
 
 
+const logout = (req, res) => {
+    res.clearCookie('session', {
+        httpOnly: true, // Matches the original cookie setting
+        secure: true,   // Matches the original cookie setting
+        sameSite: 'None', // Matches the original cookie setting
+        path: '/', // Default path, can be omitted if not explicitly set during login
+    });
+    res.status(200).json({ message: 'Logged out successfully' });
+};
+
 //Exporting the function 
 module.exports = {
     register,
     login,
     updateEmployer,
-    updatePassword
+    updatePassword,
+    logout
 };

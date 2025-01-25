@@ -4,7 +4,7 @@ import Switch from 'react-switch';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { loginEmployerApi, loginUserApi } from '../../../apis/Api';
-
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const Container = styled.div`
   display: flex;
@@ -145,7 +145,7 @@ const LoginPage = () => {
     const apiEndpoint = isEmployer ? loginEmployerApi : loginUserApi;
 
     apiEndpoint(data)
-      .then((res) => {
+      .then(async (res) => {
         if (res.data.success === false) {
           toast.error(res.data.message);
         } else {
@@ -162,6 +162,7 @@ const LoginPage = () => {
 
           // local storage set
           localStorage.setItem(isEmployer ? "employer" : "user", convertedData);
+
 
           navigate(isEmployer ? "/employer/dashboard" : "/applicant/dashboard");
         }

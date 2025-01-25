@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { FaAward, FaBriefcase, FaFileAlt, FaSearch } from 'react-icons/fa';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
+import { logoutUserApi } from '../../src/apis/Api';
 
 const NavbarContainer = styled.div`
     display: flex;
@@ -90,7 +92,24 @@ const ApplicantNavbar = () => {
 
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        try {
+            // Call the logout API
+            const response = await logoutUserApi();
+
+            if (response.status === 200) {
+                // Successfully logged out from the server
+                toast.success("user logged out");
+            } else {
+                // Handle unexpected API response
+                toast.error('Failed to log out from the server.');
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+            toast.error('Error logging out from the server.');
+        }
+
+        // Clear local storage and navigate to login
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         navigate('/login');
@@ -115,7 +134,7 @@ const ApplicantNavbar = () => {
                             <NavLink to="/applicant/hired_jobs">Current Jobs</NavLink>
                             <NavLink to="/applicant/completed_jobs">Complete Jobs</NavLink>
 
-                            <a href="#" onClick={handleLogout}>Logout</a>
+                            <a href="" onClick={handleLogout}>Logout</a>
                         </DropdownMenu>
                     )}
                 </NameAndImageContainer>

@@ -8,6 +8,9 @@ router.post("/register", userControllers.register)
 //Creationg user login route
 router.post("/login", userControllers.login)
 
+//Creationg user logout route
+router.post("/logout", userControllers.logout)
+
 //Creating user update route
 router.put("/update_applicant/:id", userControllers.updateApplicant)
 
