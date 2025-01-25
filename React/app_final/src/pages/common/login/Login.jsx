@@ -173,7 +173,7 @@ const LoginPage = () => {
           // Password expired case
           toast.error("Your password has expired. Please update it.");
           // navigate("/update-password"); // Redirect to a password update page
-        } else if (statusCode === 429) {
+        } else if (error.response.status === 429) {
           // Handle rate limiting (Too many requests)
           toast.error(error.response.data.message || "Too many login attempts. Please try again later.");
         }
