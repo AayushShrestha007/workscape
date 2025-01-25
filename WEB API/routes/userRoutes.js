@@ -14,6 +14,9 @@ router.post("/login", loginLimiter, userControllers.login)
 //Creationg user logout route
 router.post("/logout", userControllers.logout)
 
+//Creationg user logout route
+router.post("/logout", userControllers.logout)
+
 //Creating user update route
 router.put("/update_applicant/:id", userControllers.updateApplicant)
 

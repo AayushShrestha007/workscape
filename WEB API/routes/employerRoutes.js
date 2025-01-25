@@ -16,6 +16,10 @@ router.post("/login", loginLimiter, employerControllers.login)
 router.post("/logout", employerControllers.logout)
 
 
+//Creatingg user logout route
+router.post("/logout", employerControllers.logout)
+
+
 //Creationg employer update route
 router.put("/update_employer/:id", employerControllers.updateEmployer)
 
