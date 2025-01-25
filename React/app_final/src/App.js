@@ -15,6 +15,7 @@ import ApplicantJobDetails from './pages/applicant/job_detail/ApplicantJobDetail
 import HiredJobsList from './pages/applicant/jobs/HiredJobList';
 import OfferedJobsList from './pages/applicant/jobs/OfferedJobsList';
 import ApplicantRegister from './pages/applicant/register/Register';
+import UserEmailVerification from './pages/applicant/register/UserEmailVerification';
 import UpdateApplicantProfile from './pages/applicant/update_profile/UpdateApplicantProfile';
 import Login from './pages/common/login/Login';
 import CreateJobPage from './pages/employer/create_job/CreateJob';
@@ -23,11 +24,11 @@ import HiringProgress from './pages/employer/hiring_progress/hiring_progress';
 import JobApplicants from './pages/employer/job_applicants/JobApplicants';
 import CompletedJobsListOfEmployer from './pages/employer/jobs/CompleteJobsList';
 import HiredJobsListOfEmployer from './pages/employer/jobs/HiredJobsList';
+import EmployerEmailVerification from './pages/employer/register/EmployerVerification';
 import EmployerRegister from './pages/employer/register/Register';
 import UpdateEmployerProfile from './pages/employer/update_profile/UpdateEmployerProfile';
 import ApplicantRoutes from './protected_routes/ApplicantRoutes';
 import EmployerRoutes from './protected_routes/EmployerRoutes';
-
 
 //toast config
 import { ToastContainer } from 'react-toastify';
@@ -45,6 +46,8 @@ function App() {
                 <Route path='/login' element={<Login />} />
                 <Route path='/applicant/register' element={<ApplicantRegister />} />
                 <Route path='/employer/register' element={<EmployerRegister />} />
+                <Route path='/applicant/verify_email' element={< UserEmailVerification />} />
+                <Route path='/employer/verify_email' element={< EmployerEmailVerification />} />
 
                 {/* Only Applicant Accessible Routes */}
                 <Route element={<ApplicantRoutes />}>
@@ -57,6 +60,7 @@ function App() {
                     <Route path='/applicant/offered_jobs' element={< OfferedJobsList />} />
                     <Route path='/applicant/hired_jobs' element={< HiredJobsList />} />
                     <Route path='/applicant/completed_jobs' element={< CompletedJobsList />} />
+
 
 
                 </Route>
