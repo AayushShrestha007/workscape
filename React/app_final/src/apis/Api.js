@@ -20,6 +20,11 @@ const config = {
 //API FOR APPLICANT
 //login api
 export const loginUserApi = (data) => Api.post("/api/user/login", data)
+
+//logout api
+export const logoutUserApi = (data) => Api.post("/api/user/logout", data)
+
+
 //register api 
 export const registerUserApi = (data) => Api.post("/api/user/register", data)
 
@@ -38,6 +43,11 @@ export const getAllResumesApi = (page, limit) => Api.get(`/api/resume/get_all_re
 //API FOR EMPLOYER
 //login api
 export const loginEmployerApi = (data) => Api.post("/api/employer/login", data)
+
+
+//logout api
+export const logoutEmployerApi = () => Api.post("/api/employer/logout")
+
 //register api 
 export const registerEmployerApi = (data) => Api.post("/api/employer/register", data)
 //create job API

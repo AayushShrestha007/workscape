@@ -5,8 +5,12 @@ const router = require('express').Router();
 //Creating user registration route
 router.post("/register", employerControllers.register)
 
-//Creationg user login route
+//Creating user login route
 router.post("/login", employerControllers.login)
+
+
+//Creatingg user logout route
+router.post("/logout", employerControllers.logout)
 
 
 //Creationg employer update route
