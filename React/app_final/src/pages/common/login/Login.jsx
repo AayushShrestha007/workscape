@@ -103,8 +103,8 @@ const LoginPage = () => {
 
   //use state for error message
 
-  const [emailError, setEmailError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
+  const [emailError, setEmailError] = useState('abc@gmail.com')
+  const [passwordError, setPasswordError] = useState('123456!!!@@@!!ABCc')
 
   const navigate = useNavigate()
 
@@ -173,7 +173,11 @@ const LoginPage = () => {
           // Password expired case
           toast.error("Your password has expired. Please update it.");
           // navigate("/update-password"); // Redirect to a password update page
-        } else {
+        } else if (statusCode === 429) {
+          // Handle rate limiting (Too many requests)
+          toast.error(error.response.data.message || "Too many login attempts. Please try again later.");
+        }
+        else {
           // General error case
           toast.error("An error occurred. Please try again.");
           console.error("Login Error:", error);
