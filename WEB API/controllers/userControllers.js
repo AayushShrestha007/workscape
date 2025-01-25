@@ -9,19 +9,45 @@ const jwt = require('jsonwebtoken')
 
 const fs = require('fs');
 
+const nodemailer = require('nodemailer');
+
+
+//generate otp
+const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+};
+
+
+// helper code for sending verification email 
+const sendVerificationEmail = async (email, otp) => {
+    const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: process.env.EMAIL_USER, // Your Gmail address
+            pass: process.env.EMAIL_PASS, // Your Gmail password
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Verify Your Email',
+        text: `Your OTP for email verification is ${otp}. It will expire in 10 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
 //code for registration
 const register = async (req, res) => {
-
     const validatePassword = (password) => {
         const minLength = 8;
         const maxLength = 20;
 
-        // Check length
         if (password.length < minLength || password.length > maxLength) {
             return `Password must be between ${minLength} and ${maxLength} characters long.`;
         }
 
-        // Check complexity
         const uppercaseRegex = /[A-Z]/;
         const lowercaseRegex = /[a-z]/;
         const numberRegex = /[0-9]/;
@@ -40,25 +66,13 @@ const register = async (req, res) => {
             return "Password must include at least one special character.";
         }
 
-        // All checks passed
         return null;
     };
 
-
-    //1. Check incoming data
-    console.log(req.body);
-
-    //2. Destructure the incoming data
     const { name, email, phone, password } = req.body;
 
-    //3. Validate the data (if empty, stop the process & send res)
     if (!name || !email || !password) {
-        //res.send("please enter all the details")
-        return res.json({
-            "success": false,
-            "message": "Please enter all fields!"
-        })
-
+        return res.json({ success: false, message: "Please enter all fields!" });
     }
 
     const validationError = validatePassword(password);
@@ -66,99 +80,90 @@ const register = async (req, res) => {
         return res.status(400).json({ success: false, message: validationError });
     }
 
-    // Validating the image
     if (!req.files || !req.files.userImage) {
-        return res.status(400).json({
-            success: false,
-            message: 'Please upload an image!',
-        });
+        return res.status(400).json({ success: false, message: 'Please upload an image!' });
     }
 
     const { userImage } = req.files;
-
-    //  Upload the image
-    // 1. Generate new image name
     const imageName = `${Date.now()}-${userImage.name}`;
+    const imageUploadPath = path.join(__dirname, `../public/userImage/${imageName}`);
 
-    // 2. Make a upload path (/path/upload - directory)
-    const imageUploadPath = path.join(
-        __dirname,
-        `../public/userImage/${imageName}`
-    );
-
-    //4. Error handling (try/catch)
     try {
-        //5. Check if the user is already registered
-        const existingUser = await userModel.findOne({ email: email })
-        //5.1 If user found-> send response 
-        //5.1.1 stop the process
+        const existingUser = await userModel.findOne({ email: email });
         if (existingUser) {
-            return res.json({
-                "success": false,
-                "message": "user already exists"
-            })
+            return res.json({ success: false, message: "User already exists" });
         }
 
-        //5.2 if user is new:
-        //5.2.1 Hash the password
-        const randomSalt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, randomSalt)
+        const randomSalt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, randomSalt);
 
         await userImage.mv(imageUploadPath);
 
-        //5.2.2 Save to the database
-        const newUser = new userModel({
-            //database fields: client's value
+        const otp = generateOtp();
+        const hashedOtp = await bcrypt.hash(otp, 10);
 
+        const newUser = new userModel({
             name: name,
             email: email,
             phone: phone,
             password: hashedPassword,
             userImage: imageName,
+            isVerified: false, // Default to false until verified
+            emailOtp: hashedOtp,
+            emailOtpExpires: Date.now() + 10 * 60 * 1000, // OTP expires in 10 minutes
             passwordHistory: [hashedPassword],
             passwordUpdatedAt: new Date(),
-        })
+        });
 
-        //save to database
-        await newUser.save()
+        await newUser.save();
+        await sendVerificationEmail(email, otp);
 
-        //5.2.3 send successful response
-        res.status(201).json({
-            "success": true,
-            "message": "User created successfully"
-        }
-
-        )
-
-    } catch (error) {
-        console.log(error)
-        res.json({
-            "success": false,
-            "message": "Internal server error!"
-        })
-    }
-}
-
-//code to upload a file
-const uploadImage = async (req, res, next) => {
-    try {
-        if (!req.file) {
-            return res.status(400).send({ message: "Please upload a file" });
-        }
         res.status(201).json({
             success: true,
-            data: req.file.filename,
+            message: "User registered successfully. Please verify your email to continue.",
         });
     } catch (error) {
-        // Handle unexpected errors
-        console.error(error);
-        res.status(500).json({
-            success: false,
-            message: "Internal server error",
-            error: error.message
-        });
+        console.log(error);
+        res.json({ success: false, message: "Internal server error!" });
     }
 };
+
+
+const verifyEmail = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        if (user.isVerified) {
+            return res.status(400).json({ success: false, message: "Email already verified." });
+        }
+
+        if (Date.now() > user.emailOtpExpires) {
+            return res.status(400).json({ success: false, message: "OTP has expired." });
+        }
+
+        const isMatch = await bcrypt.compare(otp, user.emailOtp);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Invalid OTP." });
+        }
+
+        user.isVerified = true;
+        user.emailOtp = undefined;
+        user.emailOtpExpires = undefined;
+
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Email verified successfully." });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Internal server error!" });
+    }
+};
+
 
 
 
@@ -195,6 +200,14 @@ const login = async (req, res) => {
                 "message": "user with this email doesn't exist"
             })
         }
+
+        if (!findUser.isVerified) {
+            return res.status(401).json({
+                success: false,
+                message: "Email is not verified. Please verify your email before logging in.",
+            });
+        }
+
 
 
 
@@ -431,7 +444,7 @@ module.exports = {
     login,
     updateApplicant,
     getCurrentApplicant,
-    uploadImage,
     updatePassword,
-    logout
+    logout,
+    verifyEmail
 };

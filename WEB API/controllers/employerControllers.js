@@ -9,6 +9,34 @@ const jwt = require('jsonwebtoken')
 
 const fs = require('fs');
 
+const nodemailer = require('nodemailer');
+
+//generate otp
+const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+};
+
+
+// helper code for sending verification email 
+const sendVerificationEmail = async (email, otp) => {
+    const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: process.env.EMAIL_USER, // Your Gmail address
+            pass: process.env.EMAIL_PASS, // Your Gmail password
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Verify Your Email',
+        text: `Your OTP for email verification is ${otp}. It will expire in 10 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
 //code for registration
 const register = async (req, res) => {
 
@@ -66,31 +94,38 @@ const register = async (req, res) => {
         const randomSalt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, randomSalt)
 
+
+
         await employerImage.mv(imageUploadPath);
+
+        const otp = generateOtp();
+        const hashedOtp = await bcrypt.hash(otp, 10);
 
         //5.2.2 Save to the database
         const newEmployer = new employerModel({
-            //database fields: client's value
+
             organizationName: organizationName,
             organizationAddress: organizationAddress,
             email: email,
             phone: phone,
             password: hashedPassword,
             employerImage: imageName,
+            isVerified: false, // Default to false until verified
             passwordHistory: [hashedPassword],
             passwordUpdatedAt: new Date(),
+            emailOtp: hashedOtp,
+            emailOtpExpires: Date.now() + 10 * 60 * 1000, // OTP expires in 10 minutes
         })
 
         //save to database
         await newEmployer.save()
+        await sendVerificationEmail(email, otp);
 
         //5.2.3 send successful response
         res.status(201).json({
-            "success": true,
-            "message": "Employer created successfully"
-        }
-
-        )
+            success: true,
+            message: "Employer registered successfully. Please verify your email to continue.",
+        });
 
     } catch (error) {
         console.log(error)
@@ -100,6 +135,41 @@ const register = async (req, res) => {
         })
     }
 }
+
+const verifyEmail = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const employer = await employerModel.findOne({ email });
+        if (!employer) {
+            return res.status(404).json({ success: false, message: "Employer not found" });
+        }
+
+        if (employer.isVerified) {
+            return res.status(400).json({ success: false, message: "Email already verified." });
+        }
+
+        if (Date.now() > employer.emailOtpExpires) {
+            return res.status(400).json({ success: false, message: "OTP has expired." });
+        }
+
+        const isMatch = await bcrypt.compare(otp, employer.emailOtp);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Invalid OTP." });
+        }
+
+        employer.isVerified = true;
+        employer.emailOtp = undefined;
+        employer.emailOtpExpires = undefined;
+
+        await employer.save();
+
+        res.status(200).json({ success: true, message: "Email verified successfully." });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Internal server error!" });
+    }
+};
 
 
 //code for login
@@ -136,6 +206,13 @@ const login = async (req, res) => {
             })
         }
 
+
+        if (!findemployer.isVerified) {
+            return res.status(401).json({
+                success: false,
+                message: "Email is not verified. Please verify your email before logging in.",
+            });
+        }
 
         //compare password
         const isValidPassword = await bcrypt.compare(password, findemployer.password)
@@ -342,5 +419,6 @@ module.exports = {
     login,
     updateEmployer,
     updatePassword,
-    logout
+    logout,
+    verifyEmail,
 };

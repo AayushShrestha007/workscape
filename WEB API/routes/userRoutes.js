@@ -1,12 +1,15 @@
 const userControllers = require("../controllers/userControllers");
-
+const loginLimiter = require('../middleware/loginLimiter');
 const router = require('express').Router();
 
 //Creating user registration route
 router.post("/register", userControllers.register)
 
+//Creating email verification route
+router.post("/verify-email", userControllers.verifyEmail)
+
 //Creationg user login route
-router.post("/login", userControllers.login)
+router.post("/login", loginLimiter, userControllers.login)
 
 //Creationg user logout route
 router.post("/logout", userControllers.logout)

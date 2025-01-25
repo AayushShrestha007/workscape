@@ -3,11 +3,14 @@ const connectDatabase = require('./database/database')
 const dotenv = require('dotenv')
 const cors = require('cors');
 const fs = require('fs');
+const helmet = require('helmet');
 const fileUpload = require('express-fileupload');
 const acceptFormData = require('express-fileupload')
 const rateLimit = require('express-rate-limit');
 const { MongoClient } = require('mongodb');
 
+//dotenv configuration
+dotenv.config()
 
 const https = require('https');
 
@@ -19,9 +22,41 @@ const options = {
 //create an express application
 const app = express();
 
+app.use(helmet());
+
+
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"], // Restrict default sources
+            scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts (if necessary)
+            objectSrc: ["'none'"], // Disallow object elements
+            imgSrc: ["'self'", "data:", "http://localhost:5500"], // Allow images from the same origin and inline data
+            connectSrc: ["'self'", "http://localhost:5500"], // Allow API requests to your backend
+        },
+    })
+);
+
+//Allowing cross origin for images and resume
+
+app.use('/userImage', (req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+});
+
+app.use('/employerImage', (req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+});
+
+app.use('/userResume', (req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+});
+
 //configure cors policy
 const corsOptions = {
-    origin: "https://localhost:3000",
+    origin: ["https://localhost:3000", "http://localhost:5500"],
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     optionSuccessStatus: 200,
@@ -71,8 +106,7 @@ app.use('/api/payment', require('./routes/paymentRoutes'))
 //config form data
 app.use(acceptFormData());
 
-//dotenv configuration
-dotenv.config()
+
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Credentials", "true");

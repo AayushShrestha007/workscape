@@ -1,15 +1,18 @@
 const employerControllers = require("../controllers/employerControllers");
-
+const loginLimiter = require('../middleware/loginLimiter');
 const router = require('express').Router();
 
-//Creating user registration route
+//Creating employer registration route
 router.post("/register", employerControllers.register)
 
-//Creating user login route
-router.post("/login", employerControllers.login)
+//Creating employer email verification  route
+router.post("/verify-email", employerControllers.verifyEmail)
+
+//Creating employer login route
+router.post("/login", loginLimiter, employerControllers.login)
 
 
-//Creatingg user logout route
+//Creatingg employer  logout route
 router.post("/logout", employerControllers.logout)
 
 

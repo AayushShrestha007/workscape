@@ -250,7 +250,7 @@ const RegisterPage = () => {
             }
             else {
                 toast.success(res.data.message)
-                navigate('/login');
+                navigate('/employer/verify_email');
 
             }
 

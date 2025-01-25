@@ -60,6 +60,16 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    emailOtp: {
+        type: String
+    }, // Store hashed OTP
+    emailOtpExpires: {
+        type: Date
+    }, // Store OTP expiration time
 
 }, {
     timestamps: true
