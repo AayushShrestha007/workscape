@@ -177,6 +177,10 @@ const LoginPage = () => {
           // Handle rate limiting (Too many requests)
           toast.error(error.response.data.message || "Too many login attempts. Please try again later.");
         }
+        else if (error.response.status === 401) {
+          // Handle unverfied email
+          toast.error(error.response.data.message || "Email Not Verified");
+        }
         else {
           // General error case
           toast.error("An error occurred. Please try again.");
