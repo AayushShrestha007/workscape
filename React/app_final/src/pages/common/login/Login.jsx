@@ -103,7 +103,7 @@ const LoginPage = () => {
 
   //use state for error message
 
-  const [emailError, setEmailError] = useState('abc@gmail.com')
+  const [emailError, setEmailError] = useState('ayooshshrestha@gmail.com')
   const [passwordError, setPasswordError] = useState('123456!!!@@@!!ABCc')
 
   const navigate = useNavigate()

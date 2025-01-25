@@ -38,6 +38,26 @@ const sendVerificationEmail = async (email, otp) => {
     await transporter.sendMail(mailOptions);
 };
 
+//code for sending 2FA otp
+const sendOtpEmail = async (email, otp) => {
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Your Two-Factor Authentication OTP",
+        text: `Your OTP for 2FA login is ${otp}. It will expire in 5 minutes.`,
+    };
+    await transporter.sendMail(mailOptions);
+};
+
+
 //code for registration
 const register = async (req, res) => {
     const validatePassword = (password) => {
@@ -169,100 +189,118 @@ const verifyEmail = async (req, res) => {
 
 //code for login
 const login = async (req, res) => {
-
-    //1. Check incoming data
-    console.log(req.body);
-
-    //2. Destructure the incoming data
     const { email, password } = req.body;
 
-    //3. Validate the data (if empty, stop the process & send res)
-    if (!email || !password) {
-        return res.json({
-            "success": false,
-            "message": "Please enter all fields!"
-        })
-
-    }
-
-    //4. Error handling (try/catch)
-
-    //5.1 If username and password don't match-> send response 
     try {
-
-        // find user 
-
-        const findUser = await userModel.findOne({ email: email });
-
-        if (!findUser) {
-            return res.json({
-                "success": false,
-                "message": "user with this email doesn't exist"
-            })
+        // Find user
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        if (!findUser.isVerified) {
+        // Check email verification
+        if (!user.isVerified) {
             return res.status(401).json({
                 success: false,
-                message: "Email is not verified. Please verify your email before logging in.",
+                message: "Email is not verified. Please verify your email first.",
             });
         }
 
-
-
-
-        //compare password
-        const isValidPassword = await bcrypt.compare(password, findUser.password)
-
+        // Check password
+        const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
-            return res.json({
-                "success": false,
-                "message": "Password doesn't match"
-            })
+            return res.status(401).json({ success: false, message: "Invalid password" });
         }
 
+        // Check for password expiration
         const passwordExpiryDays = 90;
-        const currentDate = new Date();
-        const passwordAge = Math.floor((currentDate - findUser.passwordUpdatedAt) / (1000 * 60 * 60 * 24));
-
+        const passwordAge = Math.floor(
+            (Date.now() - new Date(user.passwordUpdatedAt)) / (1000 * 60 * 60 * 24)
+        );
         if (passwordAge > passwordExpiryDays) {
-            return res.status(403).json({ message: "Your password has expired. Please update it." });
+            return res.status(403).json({
+                success: false,
+                message: "Your password has expired. Please update it.",
+            });
         }
 
-        //token (Generate- User data + key)
-        const token = await jwt.sign(
-            {
-                id: findUser._id,
-                role: "applicant",
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
-        )
+        // Generate OTP for 2FA
+        const otp = generateOtp();
+        const hashedOtp = await bcrypt.hash(otp, 10);
 
-        res.cookie('session', token, {
-            httpOnly: true, // Prevent client-side scripts from accessing the cookie
+        // Save OTP and its expiration to the user's document
+        user.otp = hashedOtp;
+        user.otpExpires = Date.now() + 5 * 60 * 1000; // OTP valid for 5 minutes
+        await user.save();
+
+        // Send OTP to email
+        await sendOtpEmail(email, otp);
+
+        res.status(200).json({
+            success: true,
+            message: "OTP sent to your email for two-factor authentication.",
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+// Verify OTP for 2FA
+const verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        if (!user.otp || !user.otpExpires) {
+            return res.status(400).json({ success: false, message: "No OTP generated" });
+        }
+
+        // Check if OTP is expired
+        if (Date.now() > user.otpExpires) {
+            return res.status(400).json({ success: false, message: "OTP has expired" });
+        }
+
+        // Verify OTP
+        const isMatch = await bcrypt.compare(otp, user.otp);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Invalid OTP" });
+        }
+
+        // Clear OTP from user document after successful verification
+        user.otp = undefined;
+        user.otpExpires = undefined;
+        await user.save();
+
+        // Generate JWT token after successful 2FA
+        const token = jwt.sign(
+            { id: user._id, role: "applicant" },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        res.cookie("session", token, {
+            httpOnly: true,
             secure: true,
-            sameSite: 'None', // Prevent cross-site cookie usage
-            maxAge: 3600000, // 1 hour in milliseconds
+            sameSite: "None",
+            maxAge: 3600000, // 1 hour
         });
 
-        //5.1 If login successful send response
-        //5.1.1 stop the process
-        return res.status(201).json({
-            "success": true,
-            "message": "user login successful",
-            "token": token,
-            "userData": { findUser }
-        })
-
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+            token,
+            userData: user,
+        });
     } catch (error) {
-        console.log(error)
-        return res.json({
-            "success": false,
-            "message": "Internal server error!"
-        })
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
-}
+};
 
 
 //code to update applicant
@@ -446,5 +484,6 @@ module.exports = {
     getCurrentApplicant,
     updatePassword,
     logout,
-    verifyEmail
+    verifyEmail,
+    verifyOtp,
 };

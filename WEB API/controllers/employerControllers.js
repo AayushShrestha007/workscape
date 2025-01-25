@@ -16,6 +16,24 @@ const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
 };
 
+//code for sending 2FA otp
+const sendOtpEmail = async (email, otp) => {
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Your Two-Factor Authentication OTP",
+        text: `Your OTP for 2FA login is ${otp}. It will expire in 5 minutes.`,
+    };
+    await transporter.sendMail(mailOptions);
+};
 
 // helper code for sending verification email 
 const sendVerificationEmail = async (email, otp) => {
@@ -174,100 +192,103 @@ const verifyEmail = async (req, res) => {
 
 //code for login
 const login = async (req, res) => {
-
-    //1. Check incoming data
-    console.log(req.body);
-
-    //2. Destructure the incoming data
     const { email, password } = req.body;
 
-    //3. Validate the data (if empty, stop the process & send res)
     if (!email || !password) {
-        return res.json({
-            "success": false,
-            "message": "Please enter all fields!"
-        })
-
+        return res.status(400).json({ success: false, message: "Please enter all fields!" });
     }
 
-    //4. Error handling (try/catch)
-
-    //5.1 If email and password don't match-> send response 
     try {
-
-        // find employer 
-
-        const findemployer = await employerModel.findOne({ email: email });
-
-        if (!findemployer) {
-            return res.json({
-                "success": false,
-                "message": "employer with this email doesn't exist"
-            })
+        const employer = await employerModel.findOne({ email });
+        if (!employer) {
+            return res.status(404).json({ success: false, message: "Employer not found" });
         }
 
-
-        if (!findemployer.isVerified) {
-            return res.status(401).json({
-                success: false,
-                message: "Email is not verified. Please verify your email before logging in.",
-            });
+        if (!employer.isVerified) {
+            return res.status(401).json({ success: false, message: "Please verify your email first." });
         }
 
-        //compare password
-        const isValidPassword = await bcrypt.compare(password, findemployer.password)
-
-        if (!isValidPassword) {
-            return res.json({
-                "success": false,
-                "message": "Password doesn't match"
-            })
+        const isPasswordValid = await bcrypt.compare(password, employer.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ success: false, message: "Invalid credentials." });
         }
 
-        const passwordExpiryDays = 90;
-        const currentDate = new Date();
-        const passwordAge = Math.floor((currentDate - findemployer.passwordUpdatedAt) / (1000 * 60 * 60 * 24));
+        // Generate OTP for 2FA
+        const otp = generateOtp();
+        const hashedOtp = await bcrypt.hash(otp, 10);
 
-        if (passwordAge > passwordExpiryDays) {
-            return res.status(403).json({ message: "Your password has expired. Please update it." });
+        employer.otp = hashedOtp;
+        employer.otpExpires = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+        await employer.save();
+
+        // Send OTP via email
+        await sendOtpEmail(email, otp);
+
+        res.status(200).json({
+            success: true,
+            message: "OTP sent to your email for two-factor authentication.",
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    }
+};
+
+//code for verifying otp
+const verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        return res.status(400).json({ success: false, message: "Email and OTP are required." });
+    }
+
+    try {
+        const employer = await employerModel.findOne({ email });
+        if (!employer) {
+            return res.status(404).json({ success: false, message: "Employer not found." });
         }
 
-        //token (Generate- employer data + key)
-        const token = await jwt.sign(
+        if (Date.now() > employer.twoFactorOtpExpires) {
+            return res.status(400).json({ success: false, message: "OTP has expired." });
+        }
 
-            {
-                id: findemployer._id,
-                role: "employer"
-            },
+        const isOtpValid = await bcrypt.compare(otp, employer.otp);
+        if (!isOtpValid) {
+            return res.status(400).json({ success: false, message: "Invalid OTP." });
+        }
+
+        // Clear OTP fields after successful verification
+        employer.otp = undefined;
+        employer.otpExpires = undefined;
+        await employer.save();
+
+        // Generate JWT token for authenticated session
+        const token = jwt.sign(
+            { id: employer._id, role: "employer" },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: "1h" }
+        );
 
-        )
-
-        res.cookie('session', token, {
-            httpOnly: true, // Prevent client-side scripts from accessing the cookie
+        res.cookie("session", token, {
+            httpOnly: true,
             secure: true,
-            sameSite: 'None', // Prevent cross-site cookie usage
-            maxAge: 3600000, // 1 hour in milliseconds
+            sameSite: "None",
+            maxAge: 3600000, // 1 hour
         });
 
-        //5.1 If login successful send response
-        //5.1.1 stop the process
-        return res.status(201).json({
-            "success": true,
-            "message": "employer login successful",
-            "token": token,
-            "employerData": { findemployer }
-        })
-
+        res.status(200).json({
+            success: true,
+            message: "Login successful.",
+            token,
+            employerData: { employer },
+        });
     } catch (error) {
-        console.log(error)
-        return res.json({
-            "success": false,
-            "message": "Internal server error!"
-        })
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error." });
     }
-}
+};
+
+
 
 // code for updating employer
 const updateEmployer = async (req, res) => {
@@ -421,4 +442,5 @@ module.exports = {
     updatePassword,
     logout,
     verifyEmail,
+    verifyOtp
 };

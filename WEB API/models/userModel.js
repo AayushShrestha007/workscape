@@ -69,7 +69,13 @@ const userSchema = new mongoose.Schema({
     }, // Store hashed OTP
     emailOtpExpires: {
         type: Date
-    }, // Store OTP expiration time
+    },
+    otp: {
+        type: String
+    },
+    otpExpires: {
+        type: Date
+    },
 
 }, {
     timestamps: true

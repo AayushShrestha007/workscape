@@ -8,6 +8,9 @@ router.post("/register", employerControllers.register)
 //Creating employer email verification  route
 router.post("/verify-email", employerControllers.verifyEmail)
 
+//Creating employer otp verification  route
+router.post("/verify-otp", employerControllers.verifyOtp)
+
 //Creating employer login route
 router.post("/login", loginLimiter, employerControllers.login)
 

@@ -8,6 +8,9 @@ router.post("/register", userControllers.register)
 //Creating email verification route
 router.post("/verify-email", userControllers.verifyEmail)
 
+//Creating otp verification route
+router.post("/verify-otp", userControllers.verifyOtp)
+
 //Creationg user login route
 router.post("/login", loginLimiter, userControllers.login)
 

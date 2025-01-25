@@ -31,6 +31,9 @@ export const registerUserApi = (data) => Api.post("/api/user/register", data)
 //verify email api 
 export const verifyUserEmailApi = (data) => Api.post("/api/user/verify-email", data)
 
+//verify otp
+export const verifyUserOtpApi = (data) => Api.post("/api/user/verify-otp", data)
+
 //updateApplicantProfile API
 export const updateApplicantProfile = (id, data) => Api.put(`/api/user/update_applicant/${id}`, data, config)
 

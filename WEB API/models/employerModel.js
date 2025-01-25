@@ -44,10 +44,16 @@ const employerSchema = new mongoose.Schema({
     },
     emailOtp: {
         type: String
-    }, // Store hashed OTP
+    },
     emailOtpExpires: {
         type: Date
-    }, // 
+    },
+    otp: {
+        type: String
+    },
+    otpExpires: {
+        type: Date
+    },
 }, {
     timestamps: true
 });
