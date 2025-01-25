@@ -242,7 +242,7 @@ const RegisterPage = () => {
       }
       else {
         toast.success(res.data.message)
-        navigate('/login');
+        navigate('/applicant/verify_email');
 
       }
 

@@ -28,6 +28,9 @@ export const logoutUserApi = (data) => Api.post("/api/user/logout", data)
 //register api 
 export const registerUserApi = (data) => Api.post("/api/user/register", data)
 
+//verify email api 
+export const verifyUserEmailApi = (data) => Api.post("/api/user/verify-email", data)
+
 //updateApplicantProfile API
 export const updateApplicantProfile = (id, data) => Api.put(`/api/user/update_applicant/${id}`, data, config)
 
@@ -50,6 +53,10 @@ export const logoutEmployerApi = () => Api.post("/api/employer/logout")
 
 //register api 
 export const registerEmployerApi = (data) => Api.post("/api/employer/register", data)
+
+//verify email api 
+export const verifyEmployerEmailApi = (data) => Api.post("/api/employer/verify-email", data)
+
 //create job API
 export const createJobApi = (data) => Api.post("/api/job/create_job", data, config)
 
