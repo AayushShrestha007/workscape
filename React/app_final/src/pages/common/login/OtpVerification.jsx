@@ -1,7 +1,59 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import styled from "styled-components";
 import { verifyEmployerOtpApi, verifyUserOtpApi } from "../../../apis/Api";
+
+const PageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f7f9fc;
+`;
+
+const FormContainer = styled.div`
+  max-width: 400px;
+  width: 100%;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+`;
+
+const Title = styled.h2`
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  &:focus {
+    border-color: #2d69b3;
+  }
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 10px;
+  background-color: #2d69b3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  &:hover {
+    background-color: #1a4a8b;
+  }
+`;
 
 const OtpVerification = () => {
     const location = useLocation();
@@ -39,22 +91,23 @@ const OtpVerification = () => {
             // Display error toast
             toast.error(error.response?.data?.message || "Failed to verify OTP");
         }
-
     };
 
     return (
-        <div>
-            <h2>OTP Verification</h2>
-            <form onSubmit={handleOtpSubmit}>
-                <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                />
-                <button type="submit">Verify</button>
-            </form>
-        </div>
+        <PageContainer>
+            <FormContainer>
+                <Title>OTP Verification</Title>
+                <form onSubmit={handleOtpSubmit}>
+                    <Input
+                        type="text"
+                        placeholder="Enter OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                    />
+                    <Button type="submit">Verify</Button>
+                </form>
+            </FormContainer>
+        </PageContainer>
     );
 };
 

@@ -243,28 +243,28 @@ const verifyOtp = async (req, res) => {
     }
 
     try {
-        const employer = await employerModel.findOne({ email });
-        if (!employer) {
+        const findemployer = await employerModel.findOne({ email });
+        if (!findemployer) {
             return res.status(404).json({ success: false, message: "Employer not found." });
         }
 
-        if (Date.now() > employer.twoFactorOtpExpires) {
+        if (Date.now() > findemployer.twoFactorOtpExpires) {
             return res.status(400).json({ success: false, message: "OTP has expired." });
         }
 
-        const isOtpValid = await bcrypt.compare(otp, employer.otp);
+        const isOtpValid = await bcrypt.compare(otp, findemployer.otp);
         if (!isOtpValid) {
             return res.status(400).json({ success: false, message: "Invalid OTP." });
         }
 
         // Clear OTP fields after successful verification
-        employer.otp = undefined;
-        employer.otpExpires = undefined;
-        await employer.save();
+        findemployer.otp = undefined;
+        findemployer.otpExpires = undefined;
+        await findemployer.save();
 
         // Generate JWT token for authenticated session
         const token = jwt.sign(
-            { id: employer._id, role: "employer" },
+            { id: findemployer._id, role: "employer" },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
@@ -280,7 +280,7 @@ const verifyOtp = async (req, res) => {
             success: true,
             message: "Login successful.",
             token,
-            employerData: { employer },
+            employerData: { findemployer },
         });
     } catch (error) {
         console.error(error);
