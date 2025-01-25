@@ -18,6 +18,7 @@ import ApplicantRegister from './pages/applicant/register/Register';
 import UserEmailVerification from './pages/applicant/register/UserEmailVerification';
 import UpdateApplicantProfile from './pages/applicant/update_profile/UpdateApplicantProfile';
 import Login from './pages/common/login/Login';
+import OtpVerification from './pages/common/login/OtpVerification';
 import CreateJobPage from './pages/employer/create_job/CreateJob';
 import EmployerDashboardPage from './pages/employer/dashboard/EmployerDashboard';
 import HiringProgress from './pages/employer/hiring_progress/hiring_progress';
@@ -48,6 +49,8 @@ function App() {
                 <Route path='/employer/register' element={<EmployerRegister />} />
                 <Route path='/applicant/verify_email' element={< UserEmailVerification />} />
                 <Route path='/employer/verify_email' element={< EmployerEmailVerification />} />
+                <Route path="/employer/verify-otp" element={<OtpVerification />} />
+                <Route path="/applicant/verify-otp" element={<OtpVerification />} />
 
                 {/* Only Applicant Accessible Routes */}
                 <Route element={<ApplicantRoutes />}>

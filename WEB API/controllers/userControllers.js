@@ -128,7 +128,7 @@ const register = async (req, res) => {
             phone: phone,
             password: hashedPassword,
             userImage: imageName,
-            isVerified: false, // Default to false until verified
+            isVerified: false,
             emailOtp: hashedOtp,
             emailOtpExpires: Date.now() + 10 * 60 * 1000, // OTP expires in 10 minutes
             passwordHistory: [hashedPassword],
@@ -251,34 +251,34 @@ const verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
 
     try {
-        const user = await userModel.findOne({ email });
-        if (!user) {
+        const findUser = await userModel.findOne({ email: email });
+        if (!findUser) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        if (!user.otp || !user.otpExpires) {
+        if (!findUser.otp || !findUser.otpExpires) {
             return res.status(400).json({ success: false, message: "No OTP generated" });
         }
 
         // Check if OTP is expired
-        if (Date.now() > user.otpExpires) {
+        if (Date.now() > findUser.otpExpires) {
             return res.status(400).json({ success: false, message: "OTP has expired" });
         }
 
         // Verify OTP
-        const isMatch = await bcrypt.compare(otp, user.otp);
+        const isMatch = await bcrypt.compare(otp, findUser.otp);
         if (!isMatch) {
             return res.status(400).json({ success: false, message: "Invalid OTP" });
         }
 
-        // Clear OTP from user document after successful verification
-        user.otp = undefined;
-        user.otpExpires = undefined;
-        await user.save();
+        // // Clear OTP from user document after successful verification
+        findUser.otp = undefined;
+        findUser.otpExpires = undefined;
+        await findUser.save();
 
         // Generate JWT token after successful 2FA
         const token = jwt.sign(
-            { id: user._id, role: "applicant" },
+            { id: findUser._id, role: "applicant" },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
@@ -294,7 +294,7 @@ const verifyOtp = async (req, res) => {
             success: true,
             message: "Login successful",
             token,
-            userData: user,
+            userData: { findUser },
         });
     } catch (error) {
         console.error(error);

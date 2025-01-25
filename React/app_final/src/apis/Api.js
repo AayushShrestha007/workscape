@@ -31,7 +31,7 @@ export const registerUserApi = (data) => Api.post("/api/user/register", data)
 //verify email api 
 export const verifyUserEmailApi = (data) => Api.post("/api/user/verify-email", data)
 
-//verify otp
+//verify user otp
 export const verifyUserOtpApi = (data) => Api.post("/api/user/verify-otp", data)
 
 //updateApplicantProfile API
@@ -57,8 +57,12 @@ export const logoutEmployerApi = () => Api.post("/api/employer/logout")
 //register api 
 export const registerEmployerApi = (data) => Api.post("/api/employer/register", data)
 
+
 //verify email api 
 export const verifyEmployerEmailApi = (data) => Api.post("/api/employer/verify-email", data)
+
+//verify employer otp
+export const verifyEmployerOtpApi = (data) => Api.post("/api/employer/verify-otp", data)
 
 //create job API
 export const createJobApi = (data) => Api.post("/api/job/create_job", data, config)
