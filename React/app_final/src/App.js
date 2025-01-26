@@ -1,10 +1,14 @@
 import './App.css';
 
+import React from 'react';
+
 import {
     Route,
     BrowserRouter as Router,
     Routes
 } from "react-router-dom";
+
+//importing the csrf fetching function
 
 //importing all the jsx page routes
 import AdminLogin from './pages/admin/login/Login';
@@ -41,8 +45,32 @@ import CompletedJobsList from './pages/applicant/jobs/CompletedJobList';
 import AdminRoutes from './protected_routes/AdminRoutes';
 
 
-
 function App() {
+
+    // useEffect(() => {
+    //     const controller = new AbortController();
+    //     const signal = controller.signal;
+
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetchCsrfToken({ signal });
+    //             const { csrfToken } = response.data
+    //             localStorage.setItem("csrf", csrfToken)
+    //             console.log("CSRF token initialized");
+    //         } catch (error) {
+    //             if (error.name !== 'AbortError') {
+    //                 console.error("Failed to fetch CSRF token:", error);
+    //             }
+    //         }
+    //     };
+
+    //     fetchData();
+
+    //     return () => {
+    //         controller.abort();
+    //     };
+    // }, []);
+
     return (
         <Router>
             <ToastContainer />

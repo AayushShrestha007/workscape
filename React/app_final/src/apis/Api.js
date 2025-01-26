@@ -17,6 +17,33 @@ const config = {
     },
 };
 
+// const getCookie = (name) => {
+//     const cookies = document.cookie.split('; ');
+//     for (const cookie of cookies) {
+//         const [cookieName, cookieValue] = cookie.split('=');
+//         if (cookieName === name) {
+//             return decodeURIComponent(cookieValue);
+//         }
+//     }
+//     return null; // Return null if not found
+// };
+
+
+// Api.interceptors.request.use(
+//     (config) => {
+
+//         console.log("cookie comes right below this")
+
+//         const csrfToken = localStorage.getItem("csrf"); // Read from cookie
+//         console.log(csrfToken)
+//         if (csrfToken) {
+//             config.headers['X-CSRF-Token'] = csrfToken;
+//         }
+//         return config;
+//     },
+//     (error) => Promise.reject(error)
+// );
+
 //API FOR APPLICANT
 //login api
 export const loginUserApi = (data) => Api.post("/api/user/login", data)

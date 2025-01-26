@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { logoutUserApi } from '../../src/apis/Api';
+import DOMPurify from 'dompurify';
 
 const NavbarContainer = styled.div`
     display: flex;
