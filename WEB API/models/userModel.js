@@ -76,6 +76,10 @@ const userSchema = new mongoose.Schema({
     otpExpires: {
         type: Date
     },
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
 
 }, {
     timestamps: true

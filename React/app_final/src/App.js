@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 //importing all the jsx page routes
+import AdminLogin from './pages/admin/login/Login';
 import AppliedJobsList from './pages/applicant/applications/AppliedJobsList';
 import CreateResume from './pages/applicant/create_resume/ResumeBuilderPage';
 import ResumeList from './pages/applicant/create_resume/ResumeList';
@@ -34,7 +35,10 @@ import EmployerRoutes from './protected_routes/EmployerRoutes';
 //toast config
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminOtpVerification from './pages/admin/login/AdminOtpVerification';
 import CompletedJobsList from './pages/applicant/jobs/CompletedJobList';
+import AdminRoutes from './protected_routes/AdminRoutes';
+import AdminDashboard from './pages/admin/dashboard/AdminDashboard'
 
 
 
@@ -51,6 +55,8 @@ function App() {
                 <Route path='/employer/verify_email' element={< EmployerEmailVerification />} />
                 <Route path="/employer/verify-otp" element={<OtpVerification />} />
                 <Route path="/applicant/verify-otp" element={<OtpVerification />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/verify-otp" element={<AdminOtpVerification />} />
 
                 {/* Only Applicant Accessible Routes */}
                 <Route element={<ApplicantRoutes />}>
@@ -77,6 +83,11 @@ function App() {
                     <Route path='/employer/hiring_progress' element={<HiringProgress />} />
                     <Route path='/employer/hired_jobs' element={<HiredJobsListOfEmployer />} />
                     <Route path='/employer/completed_jobs' element={<CompletedJobsListOfEmployer />} />
+                </Route>
+
+                {/* Only Applicant Accessible Routes */}
+                <Route element={<AdminRoutes />}>
+                    <Route path='/admin/dashboard' element={<AdminDashboard />} />
                 </Route>
 
             </Routes>

@@ -93,10 +93,21 @@ const roleGuard = (role) => (req, res, next) => {
     }
 };
 
-
+// Admin guard
+const adminGuard = (req, res, next) => {
+    // Ensure the `authGuard` middleware has already set `req.user`
+    if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({
+            success: false,
+            message: "Access denied. Admins only."
+        });
+    }
+    next(); // Proceed if the user is an admin
+};
 
 
 module.exports = {
+    adminGuard,
     authGuard,
     roleGuard
 };

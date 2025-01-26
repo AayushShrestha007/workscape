@@ -101,6 +101,7 @@ app.use('/api/resume', require('./routes/resumeRoutes'))
 app.use('/api/resume', require('./routes/resumeRoutes'))
 app.use('/api/applications', require('./routes/applicationRoutes'))
 app.use('/api/payment', require('./routes/paymentRoutes'))
+app.use('/api/activity', require('./routes/activityRoutes'))
 
 
 //config form data
