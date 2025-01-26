@@ -259,10 +259,29 @@ const RegisterPage = () => {
 
     }
 
+    const validateImage = (file) => {
+        const allowedExtensions = ['jpeg', 'jpg', 'png'];
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(fileExtension)) {
+            alert('Only .jpeg, .jpg, and .png files are allowed!');
+            return false;
+        }
+        return true;
+    };
+
     const handleImageChange = (event) => {
-        if (event.target.files[0]) {
-            setProfileImage(event.target.files[0]);
-            setPreviewImage(URL.createObjectURL(event.target.files[0]));
+        const file = event.target.files[0];
+        if (file) {
+            // Validate the image
+            if (!validateImage(file)) {
+                setProfileImageError("Only .jpeg, .jpg, and .png files are allowed!");
+                return;
+            }
+
+            // If valid, set the profile image and preview
+            setProfileImage(file);
+            setPreviewImage(URL.createObjectURL(file));
+            setProfileImageError(""); // Clear any previous errors
         }
     };
 

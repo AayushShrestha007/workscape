@@ -1,10 +1,10 @@
+import DOMPurify from 'dompurify';
 import React, { useState } from 'react';
 import { FaAward, FaBriefcase, FaFileAlt, FaSearch } from 'react-icons/fa';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { logoutUserApi } from '../../src/apis/Api';
-import DOMPurify from 'dompurify';
 
 const NavbarContainer = styled.div`
     display: flex;
@@ -91,6 +91,10 @@ const ApplicantNavbar = () => {
 
     const applicant = JSON.parse(localStorage.getItem('user')).findUser
 
+    // Sanitize user-provided data
+    const sanitizedApplicantName = DOMPurify.sanitize(applicant.name || "Guest");
+    const sanitizedProfileImage = DOMPurify.sanitize(applicant.userImage || "default.png");
+
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
     const handleLogout = async () => {
@@ -127,8 +131,8 @@ const ApplicantNavbar = () => {
                     <Icon to="/applicant/offered_jobs"><FaAward title="Offer" /></Icon>
                 </NavIcons>
                 <NameAndImageContainer onClick={toggleDropdown}>
-                    <ApplicantName>{applicant.name || "name"}</ApplicantName>
-                    <ProfileImage src={`http://localhost:5500/userImage/${applicant.userImage}`} alt="Profile" />
+                    <ApplicantName>{sanitizedApplicantName || "name"}</ApplicantName>
+                    <ProfileImage src={`http://localhost:5500/userImage/${sanitizedProfileImage}`} alt="Profile" />
                     {dropdownOpen && (
                         <DropdownMenu>
                             <NavLink to="/applicant/update_profile">Edit Profile</NavLink>

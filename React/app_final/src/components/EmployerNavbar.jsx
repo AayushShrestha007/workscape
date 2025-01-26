@@ -1,7 +1,7 @@
 
-import { FaBriefcase, FaChartLine, FaCheck, FaPencilAlt } from 'react-icons/fa';
-
+import DOMPurify from 'dompurify';
 import React, { useState } from 'react';
+import { FaBriefcase, FaChartLine, FaCheck, FaPencilAlt } from 'react-icons/fa';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
@@ -93,6 +93,10 @@ const Navbar = () => {
 
     const employer = JSON.parse(localStorage.getItem('employer')).findemployer
 
+    // Sanitize user-provided data
+    const sanitizedEmployerName = DOMPurify.sanitize(employer.name || "Employer");
+    const sanitizedProfileImage = DOMPurify.sanitize(employer.employerImage || "default.png");
+
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
     const handleLogout = async () => {
@@ -138,8 +142,8 @@ const Navbar = () => {
                     </Icon>
                 </NavIcons>
                 <NameAndImageContainer onClick={toggleDropdown}>
-                    <EmployerName>{employer.organizationName || "name"}</EmployerName>
-                    <ProfileImage src={`http://localhost:5500/employerImage/${employer.employerImage}`} alt="Profile" />
+                    <EmployerName>{sanitizedEmployerName || "name"}</EmployerName>
+                    <ProfileImage src={`http://localhost:5500/employerImage/${sanitizedProfileImage}`} alt="Profile" />
                     {dropdownOpen && (
                         <DropdownMenu>
                             <NavLink to="/employer/update_profile">Edit Profile</NavLink>
