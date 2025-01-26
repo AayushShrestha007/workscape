@@ -108,7 +108,6 @@ app.use('/api/activity', require('./routes/activityRoutes'))
 app.use(acceptFormData());
 
 
-
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Origin", "https://localhost:3000");

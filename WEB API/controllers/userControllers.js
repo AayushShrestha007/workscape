@@ -278,7 +278,7 @@ const verifyOtp = async (req, res) => {
 
         // Generate JWT token after successful 2FA
         const token = jwt.sign(
-            { id: findUser._id, role: "applicant" },
+            { id: findUser._id, name: findUser.name, role: "applicant", isAdmin: findUser.isAdmin },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );

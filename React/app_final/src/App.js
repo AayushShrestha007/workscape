@@ -35,10 +35,10 @@ import EmployerRoutes from './protected_routes/EmployerRoutes';
 //toast config
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminDashboard from './pages/admin/dashboard/AdminDashboard';
 import AdminOtpVerification from './pages/admin/login/AdminOtpVerification';
 import CompletedJobsList from './pages/applicant/jobs/CompletedJobList';
 import AdminRoutes from './protected_routes/AdminRoutes';
-import AdminDashboard from './pages/admin/dashboard/AdminDashboard'
 
 
 
@@ -85,7 +85,7 @@ function App() {
                     <Route path='/employer/completed_jobs' element={<CompletedJobsListOfEmployer />} />
                 </Route>
 
-                {/* Only Applicant Accessible Routes */}
+                {/* Only Admin Accessible Routes */}
                 <Route element={<AdminRoutes />}>
                     <Route path='/admin/dashboard' element={<AdminDashboard />} />
                 </Route>

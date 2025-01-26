@@ -2,6 +2,8 @@ const userControllers = require("../controllers/userControllers");
 const loginLimiter = require('../middleware/loginLimiter');
 const router = require('express').Router();
 
+const logActivity = require("../middleware/logActivity");
+
 //Creating user registration route
 router.post("/register", userControllers.register)
 
@@ -18,16 +20,16 @@ router.post("/login", loginLimiter, userControllers.login)
 router.post("/logout", userControllers.logout)
 
 //Creationg user logout route
-router.post("/logout", userControllers.logout)
+router.post("/logout", logActivity, userControllers.logout)
 
 //Creating user update route
-router.put("/update_applicant/:id", userControllers.updateApplicant)
+router.put("/update_applicant/:id", logActivity,userControllers.updateApplicant)
 
 //Creating password update route
-router.post("/update_password/:id", userControllers.updatePassword)
+router.post("/update_password/:id", logActivity,userControllers.updatePassword)
 
 
 //Creationg route for getting current applicant
-router.get("/get_current_applicant", userControllers.getCurrentApplicant)
+router.get("/get_current_applicant", logActivity,userControllers.getCurrentApplicant)
 
 module.exports = router;

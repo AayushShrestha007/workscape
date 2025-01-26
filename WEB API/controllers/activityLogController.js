@@ -1,12 +1,7 @@
+const activityLogModel = require('../models/activityLogModel');
+
 const getActivityLogs = async (req, res) => {
     try {
-        if (!req.user.isAdmin) {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied. Admins only.",
-            });
-        }
-
         // Fetch logs from the database
         const logs = await activityLogModel.find().sort({ createdAt: -1 });
 

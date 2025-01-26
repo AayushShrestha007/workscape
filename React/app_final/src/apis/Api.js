@@ -117,5 +117,6 @@ export const getCompleteApplicationsByEmployerApi = (page, limit) => Api.get(`/a
 export const updateApplicationStatusApi = (data) => Api.put("/api/applications/update_application_status", data, config)
 
 
-
+//activity log api
+export const getActivityLog = () => Api.get("/api/activity/get_activity_log", config)
 

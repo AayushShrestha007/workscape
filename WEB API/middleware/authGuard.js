@@ -95,7 +95,7 @@ const roleGuard = (role) => (req, res, next) => {
 
 // Admin guard
 const adminGuard = (req, res, next) => {
-    // Ensure the `authGuard` middleware has already set `req.user`
+
     if (!req.user || !req.user.isAdmin) {
         return res.status(403).json({
             success: false,

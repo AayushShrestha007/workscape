@@ -1,19 +1,17 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
-const AdminRoutes = ({ children }) => {
-
-    const token = localStorage.getItem("token");
+const AdminRoutes = () => {
+    // Retrieve admin information from localStorage
     const admin = JSON.parse(localStorage.getItem("admin"));
+    const token = localStorage.getItem("token");
 
-
-
-    if (!token || !admin || !admin.findUser.isAdmin) {
-        // Redirect to the admin login page if not authenticated as admin
-        return <Navigate to="/login" replace />;
-    }
-
-    return children;
+    // Check if the user is an admin
+    return admin && token && admin.findUser.isAdmin ? (
+        <Outlet />
+    ) : (
+        <Navigate to="/admin/login" replace />
+    );
 };
 
 export default AdminRoutes;

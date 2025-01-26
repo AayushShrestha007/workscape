@@ -264,7 +264,9 @@ const verifyOtp = async (req, res) => {
 
         // Generate JWT token for authenticated session
         const token = jwt.sign(
-            { id: findemployer._id, role: "employer" },
+            {
+                id: findemployer._id, name: findemployer.organizationName, role: "employer", isAdmin: findemployer.isAdmin
+            },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
