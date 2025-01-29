@@ -12,28 +12,23 @@ const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 const { xss } = require('express-xss-sanitizer');
-
+const https = require('https');
 
 //dotenv configuration
 dotenv.config()
 
-const https = require('https');
-
-const options = {
-    key: fs.readFileSync('/Users/ayush/Desktop/Softwarica 6th Semester/Security/Certificates/server.key'),
-    cert: fs.readFileSync('/Users/ayush/Desktop/Softwarica 6th Semester/Security/Certificates/server.crt'),
-}
 
 //create an express application
 const app = express();
 
+const key = fs.readFileSync('../Certificates/server.key');
+const cert = fs.readFileSync('../Certificates/server.crt');
+const httpsOptions = { key, cert };
 
-
-app.use(xss());
 
 //configure cors policy
 const corsOptions = {
-    origin: ["https://localhost:3000", "http://localhost:5500"],
+    origin: ["https://localhost:3000", "https://localhost:5500"],
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     optionSuccessStatus: 200,
@@ -90,8 +85,8 @@ app.use(
             defaultSrc: ["'self'"], // Restrict default sources
             scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts (if necessary)
             objectSrc: ["'none'"], // Disallow object elements
-            imgSrc: ["'self'", "data:", "http://localhost:5500"], // Allow images from the same origin and inline data
-            connectSrc: ["'self'", "http://localhost:5500"], // Allow API requests to your backend
+            imgSrc: ["'self'", "data:", "https://localhost:5500"], // Allow images from the same origin and inline data
+            connectSrc: ["'self'", "https://localhost:5500"], // Allow API requests to your backend
         },
     })
 );
@@ -118,7 +113,7 @@ app.use('/userResume', (req, res, next) => {
 //configuring rate limit to protect against DOS attack
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100000, // Limit each IP to 100 requests per windowMs
+    max: 300, // Limit each IP to 100 requests per windowMs
     message: "Too many requests from this IP, please try again after 15 minutes.",
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -129,13 +124,19 @@ app.use(limiter);
 
 
 
-
-
 //express json config
 app.use(express.json())
 
+app.use(express.urlencoded({ extended: true }));
 
+//implementing mongo sanitize
+app.use(
+    mongoSanitize({
+        replaceWith: '_', // Optional: replaces prohibited characters with '_'
+    })
+);
 
+app.use(xss());
 
 
 //make a static public folder
@@ -188,14 +189,15 @@ app.post('/test', (req, res) => {
 })
 
 
+
+// Create HTTPS server
+const server = https.createServer(httpsOptions, app);
+
+
 // Starting the server
-// https.createServer(options, app).listen(PORT, () => {
-//     console.log(`HTTPS server is running on port ${PORT}!`);
+server.listen(5500, () => {
+    console.log(`HTTPS Server running on port ${PORT}`);
+});
 
-// });
-
-app.listen(PORT, () => {
-    console.log(`server is now running on port ${PORT}!`);
-})
 
 module.exports = app;

@@ -161,7 +161,7 @@ const JobApplicants = () => {
             {applicants.map(applicant => (
               <ApplicantCard key={applicant._id}>
                 <ApplicantHeader>
-                  <ApplicantImage src={`http://localhost:5500/userImage/${applicant.userImage}`} alt="Applicant" />
+                  <ApplicantImage src={`https://localhost:5500/userImage/${applicant.userImage}`} alt="Applicant" />
                   <ApplicantDetailsContainer>
                     <ApplicantName>{applicant.name}</ApplicantName>
                     <ApplicantEmail>{applicant.email}</ApplicantEmail>
@@ -171,7 +171,7 @@ const JobApplicants = () => {
                   <Button onClick={() => {
                     const applicationId = findApplication(applicant, jobId);
                     const resumeUrl = getResumeUrl(applicant, applicationId.resume);
-                    window.open(`http://localhost:5500${resumeUrl}`, '_blank');
+                    window.open(`https://localhost:5500${resumeUrl}`, '_blank');
                   }}>
                     Review Resume
                   </Button>

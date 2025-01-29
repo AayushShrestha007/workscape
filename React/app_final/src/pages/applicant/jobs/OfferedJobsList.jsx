@@ -175,7 +175,7 @@ const OfferedJobsList = () => {
               applications.map((application, index) => (
                 <React.Fragment key={application._id}>
                   <ApplicationHeader>
-                    <EmployerImage src={`http://localhost:5500/employerImage/${application.job.employer.employerImage}`} alt="Employer" />
+                    <EmployerImage src={`https://localhost:5500/employerImage/${application.job.employer.employerImage}`} alt="Employer" />
                     <ApplicationDetailsContainer>
                       <JobTitle>{application.job.title}</JobTitle>
                       <EmployerName>{application.job.employer.organizationName}</EmployerName>

@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export const fetchCsrfToken = async () => {
     try {
-        const response = await axios.get('http://localhost:5500/api/csrf-token', {
+        const response = await axios.get('https://localhost:5500/api/csrf-token', {
             withCredentials: true,
         });
         // Cookie is now set automatically

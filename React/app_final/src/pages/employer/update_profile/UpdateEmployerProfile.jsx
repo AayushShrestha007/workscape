@@ -98,7 +98,7 @@ const UpdateEmployerProfile = () => {
             setOrganizationAddress(employer.organizationAddress || '');
             setEmail(employer.email || '');
             setPhone(employer.phone || '');
-            setPreviewImage(`http://localhost:5500/employerImage/${employer.employerImage}`);
+            setPreviewImage(`https://localhost:5500/employerImage/${employer.employerImage}`);
         }
     }, []);
 

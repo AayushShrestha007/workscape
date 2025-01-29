@@ -143,7 +143,7 @@ const Navbar = () => {
                 </NavIcons>
                 <NameAndImageContainer onClick={toggleDropdown}>
                     <EmployerName>{sanitizedEmployerName || "name"}</EmployerName>
-                    <ProfileImage src={`http://localhost:5500/employerImage/${sanitizedProfileImage}`} alt="Profile" />
+                    <ProfileImage src={`https://localhost:5500/employerImage/${sanitizedProfileImage}`} alt="Profile" />
                     {dropdownOpen && (
                         <DropdownMenu>
                             <NavLink to="/employer/update_profile">Edit Profile</NavLink>

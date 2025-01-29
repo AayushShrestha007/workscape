@@ -17,8 +17,8 @@ const paymentInitialize = async (req, res) => {
             amount: amount * 100, // amount should be in paisa (Rs * 100)
             purchase_order_id: orderId, // use the generated order ID
             purchase_order_name: "Payment For Premium",
-            return_url: 'http://localhost:5500/api/khalti/khalti_verify_payment',
-            website_url: website_url || "http://localhost:3000",
+            return_url: 'https://localhost:5500/api/khalti/khalti_verify_payment',
+            website_url: website_url || "https://localhost:3000",
         });
 
         // Ensure we got a valid pidx/transactionId

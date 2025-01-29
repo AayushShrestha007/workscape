@@ -92,7 +92,7 @@ const UpdateApplicantProfile = () => {
     if (user) {
       setName(user.name || '');
       setEmail(user.email || '');
-      setPreviewImage(`http://localhost:5500/userImage/${user.userImage}`);
+      setPreviewImage(`https://localhost:5500/userImage/${user.userImage}`);
     }
   }, []);
 

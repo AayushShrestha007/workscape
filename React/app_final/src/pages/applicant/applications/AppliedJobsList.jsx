@@ -106,80 +106,80 @@ const PageNumber = styled.button`
 `;
 
 const AppliedJobsList = () => {
-    const [appliedJobs, setAppliedJobs] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [applicationsPerPage] = useState(3);
-    const [totalApplications, setTotalApplications] = useState(0);
-    const [loading, setLoading] = useState(true);
+  const [appliedJobs, setAppliedJobs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [applicationsPerPage] = useState(3);
+  const [totalApplications, setTotalApplications] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchAppliedJobs(currentPage);
-    }, [currentPage]);
+  useEffect(() => {
+    fetchAppliedJobs(currentPage);
+  }, [currentPage]);
 
-    const fetchAppliedJobs = async (page) => {
-        try {
-            setLoading(true);
-            const res = await getUserAppliedJobsApi(page, applicationsPerPage);
-            setAppliedJobs(res.data.applications);
-            setTotalApplications(res.data.totalApplications);
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
-        }
-    };
+  const fetchAppliedJobs = async (page) => {
+    try {
+      setLoading(true);
+      const res = await getUserAppliedJobsApi(page, applicationsPerPage);
+      setAppliedJobs(res.data.applications);
+      setTotalApplications(res.data.totalApplications);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    return (
-        <>
-            <ApplicantNavbar />
-            <PageContainer>
-                <Title>Jobs You've Applied For</Title>
-                {loading ? <Loader /> : (
-                    <>
-                        <JobsContainer>
-                            {appliedJobs.length === 0 ? (
-                                <p>No jobs applied for yet.</p>
-                            ) : (
-                                appliedJobs.map(application => (
-                                    <JobCard key={application._id}>
-                                        <JobHeader>
-                                            {application.job.employer && (
-                                                <EmployerImage
-                                                    src={`http://localhost:5500/employerImage/${application.job.employer.employerImage}`}
-                                                    alt="Employer"
-                                                />
-                                            )}
-                                            <JobDetails>
-                                                <JobTitle>{application.job.title}</JobTitle>
-                                                {application.job.employer && (
-                                                    <EmployerName>{application.job.employer.organizationName}</EmployerName>
-                                                )}
-                                            </JobDetails>
-                                        </JobHeader>
-                                        <JobDescription>{application.job.description}</JobDescription>
-                                        <JobStatus>Status: {application.status}</JobStatus>
-                                    </JobCard>
-                                ))
-                            )}
-                        </JobsContainer>
-                        <PaginationContainer>
-                            {[...Array(Math.ceil(totalApplications / applicationsPerPage)).keys()].map(number => (
-                                <PageNumber
-                                    key={number + 1}
-                                    onClick={() => paginate(number + 1)}
-                                    className={currentPage === number + 1 ? 'active' : ''}
-                                >
-                                    {number + 1}
-                                </PageNumber>
-                            ))}
-                        </PaginationContainer>
-                    </>
-                )}
-            </PageContainer>
-        </>
-    );
+  return (
+    <>
+      <ApplicantNavbar />
+      <PageContainer>
+        <Title>Jobs You've Applied For</Title>
+        {loading ? <Loader /> : (
+          <>
+            <JobsContainer>
+              {appliedJobs.length === 0 ? (
+                <p>No jobs applied for yet.</p>
+              ) : (
+                appliedJobs.map(application => (
+                  <JobCard key={application._id}>
+                    <JobHeader>
+                      {application.job.employer && (
+                        <EmployerImage
+                          src={`https://localhost:5500/employerImage/${application.job.employer.employerImage}`}
+                          alt="Employer"
+                        />
+                      )}
+                      <JobDetails>
+                        <JobTitle>{application.job.title}</JobTitle>
+                        {application.job.employer && (
+                          <EmployerName>{application.job.employer.organizationName}</EmployerName>
+                        )}
+                      </JobDetails>
+                    </JobHeader>
+                    <JobDescription>{application.job.description}</JobDescription>
+                    <JobStatus>Status: {application.status}</JobStatus>
+                  </JobCard>
+                ))
+              )}
+            </JobsContainer>
+            <PaginationContainer>
+              {[...Array(Math.ceil(totalApplications / applicationsPerPage)).keys()].map(number => (
+                <PageNumber
+                  key={number + 1}
+                  onClick={() => paginate(number + 1)}
+                  className={currentPage === number + 1 ? 'active' : ''}
+                >
+                  {number + 1}
+                </PageNumber>
+              ))}
+            </PaginationContainer>
+          </>
+        )}
+      </PageContainer>
+    </>
+  );
 }
 
 export default AppliedJobsList;

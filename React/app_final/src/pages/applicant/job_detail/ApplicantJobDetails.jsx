@@ -142,7 +142,7 @@ const ApplicantJobDetails = () => {
         {loading ? <Loader /> : (
           <JobContainer>
             <JobHeader>
-              <EmployerImage src={`http://localhost:5500/employerImage/${job.employer.employerImage}`} alt="Employer" />
+              <EmployerImage src={`https://localhost:5500/employerImage/${job.employer.employerImage}`} alt="Employer" />
               <JobDetails>
                 <JobTitle>{job.title}</JobTitle>
                 <EmployerName>{job.employer.organizationName}</EmployerName>

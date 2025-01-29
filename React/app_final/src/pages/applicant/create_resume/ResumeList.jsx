@@ -143,7 +143,7 @@ const ResumeList = () => {
               {resumes.map(resume => (
                 <ResumeCard key={resume._id}>
                   <ResumeTitle>{resume.resumeTitle}</ResumeTitle>
-                  <Button onClick={() => window.open(`http://localhost:5500${resume.fileUrl}`, '_blank')}>View Resume</Button>
+                  <Button onClick={() => window.open(`https://localhost:5500${resume.fileUrl}`, '_blank')}>View Resume</Button>
                 </ResumeCard>
               ))}
             </ResumesContainer>

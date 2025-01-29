@@ -30,7 +30,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "export \"HTTPS=true\" && set \"SSL_CRT_FILE=/Users/ayush/Desktop/Softwarica 6th Semester/Security/Certificates/server.crt\" && set \"SSL_KEY_FILE=/Users/ayush/Desktop/Softwarica 6th Semester/Security/Certificates/server.key\" && react-scripts start",
+    "start": "HTTPS=true SSL_CRT_FILE=../../Certificates/server.crt SSL_KEY_FILE=../../Certificates/server.key react-scripts start",
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!axios)/\"",
     "eject": "react-scripts eject"

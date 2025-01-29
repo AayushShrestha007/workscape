@@ -75,7 +75,7 @@ const ApplicationCard = ({ application, fetchApplications }) => {
           <option value="job-offered">Job Offered</option>
           <option value="rejected">Rejected</option>
         </StatusDropdown>
-        <ViewResume onClick={() => window.open(`http://localhost:5500${application.resume.fileUrl}`, '_blank')}>
+        <ViewResume onClick={() => window.open(`https://localhost:5500${application.resume.fileUrl}`, '_blank')}>
           View Resume &gt;
         </ViewResume>
       </ActionsContainer>
