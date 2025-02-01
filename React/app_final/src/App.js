@@ -1,6 +1,8 @@
 import './App.css';
 
-import React from 'react';
+import axios from "axios";
+
+import React, { useEffect } from "react";
 
 import {
     Route,
@@ -19,6 +21,7 @@ import ApplicantDashboard from './pages/applicant/dashboard/ApplicantDashboard';
 import ApplicantJobDetails from './pages/applicant/job_detail/ApplicantJobDetails';
 import HiredJobsList from './pages/applicant/jobs/HiredJobList';
 import OfferedJobsList from './pages/applicant/jobs/OfferedJobsList';
+import PaymentSuccess from './pages/applicant/payment/PaymentSuccess';
 import ApplicantRegister from './pages/applicant/register/Register';
 import UserEmailVerification from './pages/applicant/register/UserEmailVerification';
 import UpdateApplicantProfile from './pages/applicant/update_profile/UpdateApplicantProfile';
@@ -42,35 +45,27 @@ import 'react-toastify/dist/ReactToastify.css';
 import AdminDashboard from './pages/admin/dashboard/AdminDashboard';
 import AdminOtpVerification from './pages/admin/login/AdminOtpVerification';
 import CompletedJobsList from './pages/applicant/jobs/CompletedJobList';
+import Payment from './pages/applicant/payment/Payment';
 import AdminRoutes from './protected_routes/AdminRoutes';
 
-
 function App() {
+    useEffect(() => {
+        const getCsrfToken = async () => {
+            try {
+                // Make sure to include { withCredentials: true } if your server sets the token in a cookie
+                const res = await axios.get('https://localhost:5500/api/csrf-token', {
+                    withCredentials: true,
+                });
 
-    // useEffect(() => {
-    //     const controller = new AbortController();
-    //     const signal = controller.signal;
+                // Save token to localStorage (or Redux, context, etc.)
+                localStorage.setItem('csrf', res.data.csrfToken);
+            } catch (err) {
+                console.error('Failed to get CSRF token', err);
+            }
+        };
 
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetchCsrfToken({ signal });
-    //             const { csrfToken } = response.data
-    //             localStorage.setItem("csrf", csrfToken)
-    //             console.log("CSRF token initialized");
-    //         } catch (error) {
-    //             if (error.name !== 'AbortError') {
-    //                 console.error("Failed to fetch CSRF token:", error);
-    //             }
-    //         }
-    //     };
-
-    //     fetchData();
-
-    //     return () => {
-    //         controller.abort();
-    //     };
-    // }, []);
-
+        getCsrfToken();
+    }, []);
     return (
         <Router>
             <ToastContainer />
@@ -97,6 +92,8 @@ function App() {
                     <Route path='/applicant/offered_jobs' element={< OfferedJobsList />} />
                     <Route path='/applicant/hired_jobs' element={< HiredJobsList />} />
                     <Route path='/applicant/completed_jobs' element={< CompletedJobsList />} />
+                    <Route path='/applicant/payment' element={< Payment />} />
+                    <Route path='/applicant/payment_success' element={< PaymentSuccess />} />
 
 
 

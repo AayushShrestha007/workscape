@@ -132,12 +132,14 @@ const ApplicantNavbar = () => {
                 </NavIcons>
                 <NameAndImageContainer onClick={toggleDropdown}>
                     <ApplicantName>{sanitizedApplicantName || "name"}</ApplicantName>
-                    <ProfileImage src={`https://localhost:5500/userImage/${sanitizedProfileImage}`} alt="Profile" />
+                    <ApplicantName>{applicant.name}</ApplicantName>
+                    {/* <ProfileImage src={`https://localhost:5500/userImage/${sanitizedProfileImage}`} alt="Profile" /> */}
                     {dropdownOpen && (
                         <DropdownMenu>
                             <NavLink to="/applicant/update_profile">Edit Profile</NavLink>
                             <NavLink to="/applicant/hired_jobs">Current Jobs</NavLink>
                             <NavLink to="/applicant/completed_jobs">Complete Jobs</NavLink>
+                            <NavLink to="/applicant/payment">Get Premium</NavLink>
 
                             <a href="" onClick={handleLogout}>Logout</a>
                         </DropdownMenu>

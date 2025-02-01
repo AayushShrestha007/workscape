@@ -94,7 +94,7 @@ const Navbar = () => {
     const employer = JSON.parse(localStorage.getItem('employer')).findemployer
 
     // Sanitize user-provided data
-    const sanitizedEmployerName = DOMPurify.sanitize(employer.name || "Employer");
+    const sanitizedEmployerName = DOMPurify.sanitize(employer.organizationName || "Employer");
     const sanitizedProfileImage = DOMPurify.sanitize(employer.employerImage || "default.png");
 
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);

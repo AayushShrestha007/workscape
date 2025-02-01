@@ -17,7 +17,7 @@ const paymentInitialize = async (req, res) => {
             amount: amount * 100, // amount should be in paisa (Rs * 100)
             purchase_order_id: orderId, // use the generated order ID
             purchase_order_name: "Payment For Premium",
-            return_url: 'https://localhost:5500/api/khalti/khalti_verify_payment',
+            return_url: "https://localhost:5500/api/payment/khalti_verify_payment",
             website_url: website_url || "https://localhost:3000",
         });
 
@@ -25,6 +25,7 @@ const paymentInitialize = async (req, res) => {
         if (paymentInitate && paymentInitate.pidx) {
             // Create the payment record in the database after successful initialization
             const newPayment = await Payment.create({
+                userId: req.user.id,
                 orderId: orderId,
                 transactionId: paymentInitate.pidx,
                 pidx: paymentInitate.pidx,
@@ -105,10 +106,19 @@ const paymentCompleteVerify = async (req, res) => {
         // Log the updated payment data
         console.log("Updated payment data:", paymentData);
 
+        // Retrieve the userId from the payment document instead of req.user.id
+        const userId = paymentData.userId;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: "No userId found in payment record",
+            });
+        }
+
         // Update the currently logged-in user's hasPremium property
-        console.log(`Updating hasPremium property for user ID: ${req.user.id}`);
+
         const user = await User.findByIdAndUpdate(
-            req.user.id,
+            userId,
             { hasPremium: true },
             { new: true }
         );
@@ -118,7 +128,7 @@ const paymentCompleteVerify = async (req, res) => {
 
         // Redirect to the Khalti payment page with the pidx
         console.log(`Redirecting to Khalti payment page with pidx: ${pidx}`);
-        res.redirect(`https://test-pay.khalti.com/?pidx=${pidx}`);
+        res.redirect(`https://localhost:3000/applicant/payment_success`);
 
     } catch (error) {
         // Log any errors that occur during the process

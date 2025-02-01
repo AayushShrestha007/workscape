@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
         },
         status: {
             type: String,
-            enum: ['applied', 'shortlisted', 'hired', 'rejected'],
+            enum: ['applied', 'shortlisted', 'hired', 'rejected', 'complete'],
             default: 'applied'
         },
         appliedOn: {

@@ -85,8 +85,8 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isEmployer, setIsEmployer] = useState(false); // Boolean state for the switch
-  const [emailError, setEmailError] = useState("ayooshshrestha@gmail.com");
-  const [passwordError, setPasswordError] = useState("123456!!!@@@!!ABCc");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
 
   // Validation

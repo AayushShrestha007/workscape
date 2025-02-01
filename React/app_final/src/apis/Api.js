@@ -17,32 +17,48 @@ const config = {
     },
 };
 
-// const getCookie = (name) => {
-//     const cookies = document.cookie.split('; ');
-//     for (const cookie of cookies) {
-//         const [cookieName, cookieValue] = cookie.split('=');
-//         if (cookieName === name) {
-//             return decodeURIComponent(cookieValue);
-//         }
-//     }
-//     return null; // Return null if not found
-// };
+Api.interceptors.request.use(
+    (config) => {
+        // Retrieve token from localStorage
+        const csrfToken = localStorage.getItem("csrf");
+
+        if (csrfToken) {
+            config.headers['X-CSRF-Token'] = csrfToken;
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
 
-// Api.interceptors.request.use(
-//     (config) => {
+Api.interceptors.response.use(
+    (response) => {
+        // If response is successful, just pass it through
+        return response;
+    },
+    (error) => {
+        // Check if it's the 'jwt expired' error (or adapt to your needs)
+        if (
+            error.response &&
+            error.response.status === 400 &&
+            error.response.data &&
+            error.response.data.error === "jwt expired"
+        ) {
+            // Remove any user-related data from localStorage
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+            // Redirect to the login page
+            window.location.href = "/login";
+        }
 
-//         console.log("cookie comes right below this")
+        // Otherwise, return the error as usual
+        return Promise.reject(error);
+    }
+);
 
-//         const csrfToken = localStorage.getItem("csrf"); // Read from cookie
-//         console.log(csrfToken)
-//         if (csrfToken) {
-//             config.headers['X-CSRF-Token'] = csrfToken;
-//         }
-//         return config;
-//     },
-//     (error) => Promise.reject(error)
-// );
 
 //API FOR APPLICANT
 //login api
@@ -147,3 +163,5 @@ export const updateApplicationStatusApi = (data) => Api.put("/api/applications/u
 //activity log api
 export const getActivityLog = () => Api.get("/api/activity/get_activity_log", config)
 
+//activity log api
+export const initiatePayment = (data) => Api.post("/api/payment/khalti_initilization", data, config)

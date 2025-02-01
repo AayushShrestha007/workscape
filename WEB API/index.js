@@ -8,7 +8,7 @@ const fileUpload = require('express-fileupload');
 const acceptFormData = require('express-fileupload')
 const rateLimit = require('express-rate-limit');
 const { MongoClient } = require('mongodb');
-const csrf = require('csurf');
+const csurf = require('csurf');
 const cookieParser = require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 const { xss } = require('express-xss-sanitizer');
@@ -25,6 +25,10 @@ const key = fs.readFileSync('../Certificates/server.key');
 const cert = fs.readFileSync('../Certificates/server.crt');
 const httpsOptions = { key, cert };
 
+//express json config
+app.use(express.json())
+
+app.use(cookieParser());
 
 //configure cors policy
 const corsOptions = {
@@ -37,41 +41,31 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 
-// Parse cookies
-// app.use(cookieParser());
 
+const csrfProtection = csurf({
+    cookie: {
+        httpOnly: true,  // prevents client-side JavaScript from reading the cookie
+        secure: false,   // set to true in production (requires HTTPS)
+        sameSite: 'strict'
+    }
+});
 
-// app.use(
-//     csrf({
-//         cookie: {
-//             key: 'XSRF-TOKEN',
-//             httpOnly: false,
-//             secure: process.env.NODE_ENV === 'production',
-//             sameSite: 'Lax',
-//         },
-//     })
-// );
+app.use(csrfProtection);
 
-// // Define the CSRF token route
-// app.get('/api/csrf-token', (req, res) => {
-//     res.cookie('XSRF-TOKEN', req.csrfToken(), {
-//         httpOnly: false,
-//         secure: process.env.NODE_ENV === 'production',
-//         sameSite: 'Lax',
-//     });
-//     res.json({ csrfToken: req.csrfToken() });
-// });
+app.get('/api/csrf-token', (req, res) => {
+    // `req.csrfToken()` is provided by the csurf middleware
+    const csrfToken = req.csrfToken();
+    res.json({ csrfToken });
+});
 
-
-// app.use((err, req, res, next) => {
-//     if (err.code === 'EBADCSRFTOKEN') {
-//         // CSRF token validation failed
-//         res.status(403).json({ message: 'Invalid CSRF token' });
-//     } else {
-//         next(err);
-//     }
-// });
-
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        // CSRF token errors here
+        return res.status(403).json({ error: 'Invalid CSRF token' });
+    }
+    // ...other error handling...
+    next(err);
+});
 
 
 
@@ -124,8 +118,7 @@ app.use(limiter);
 
 
 
-//express json config
-app.use(express.json())
+
 
 app.use(express.urlencoded({ extended: true }));
 
