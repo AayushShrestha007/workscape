@@ -78,7 +78,7 @@ app.use(
         directives: {
             defaultSrc: ["'self'"], // Restrict default sources
             scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts (if necessary)
-            objectSrc: ["'none'"], // Disallow object elements
+            objectSrc: ["'none'"], // Disallow object elements, protects against plugin based vulnerability
             imgSrc: ["'self'", "data:", "https://localhost:5500"], // Allow images from the same origin and inline data
             connectSrc: ["'self'", "https://localhost:5500"], // Allow API requests to your backend
         },
@@ -156,21 +156,6 @@ app.use('/api/activity', require('./routes/activityRoutes'))
 
 //config form data
 app.use(acceptFormData());
-
-//commented to make xsrf work
-// app.use((req, res, next) => {
-//     res.setHeader("Access-Control-Allow-Credentials", "true");
-//     res.setHeader("Access-Control-Allow-Origin", "https://localhost:3000");
-//     res.setHeader(
-//         "Access-Control-Allow-Methods",
-//         "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-//     );
-//     res.setHeader(
-//         "Access-Control-Allow-Headers",
-//         "Content-Type,Authorization,X-CSRF-Token"
-//     );
-//     next();
-// });
 
 
 //using the port defined in env

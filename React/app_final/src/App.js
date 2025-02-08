@@ -52,7 +52,7 @@ function App() {
     useEffect(() => {
         const getCsrfToken = async () => {
             try {
-                // Make sure to include { withCredentials: true } if your server sets the token in a cookie
+
                 const res = await axios.get('https://localhost:5500/api/csrf-token', {
                     withCredentials: true,
                 });
