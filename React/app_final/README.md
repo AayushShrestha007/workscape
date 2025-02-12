@@ -47,21 +47,15 @@ The frontend communicates with the backend through a RESTful API, enabling funct
 
 The following environment variables are required to run the WorkScape frontend:
 
--   **REACT_APP_API_URL:** [http://localhost:5500](http://localhost:5000)
+-   **REACT_APP_API_URL:** https://localhost:5500
 
 ## Getting Started
-
-1.  **Clone the repository:**  
-    `git clone https://github.com/st6003/frontend-seca-AayushShrestha007`
     
-2.  **Install dependencies:**  
+1.  **Install dependencies:**  
     `npm install`
     
-3.  **Start the development server:**  
+2.  **Start the development server:**  
     `npm start`
     
-4.  **Build the project:**  
-    `npm run build`
-    
-5.  **Environment Setup:**  
+3.  **Environment Setup:**  
     Update the `.env` file with appropriate API URLs and keys.
