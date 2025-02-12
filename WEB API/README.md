@@ -1,6 +1,6 @@
-﻿# Job Mate Backend Server
+﻿# WorkScape Backend Server
 
-This is the backend server for the **Job Mate** job management platform. The server handles all API requests, including user (applicant and employer) authentication, job management, resume handling, application processing, and more.
+This is the backend server for the **WorkScape** job management platform. The server handles all API requests, including user (applicant and employer) authentication, job management, resume handling, application processing, and more.
 
 ## Features
 
@@ -89,8 +89,8 @@ This is the backend server for the **Job Mate** job management platform. The ser
     -   Allows employers to update the status of a job application.
     
    ## Environment Variables
--  **API_URL**: [http://localhost:5500](http://localhost:5500/)  
+-  **API_URL**: [https://localhost:5500]
 - **KHALTI_URL**: [https://test-pay.khalti.com/](https://test-pay.khalti.com/)  
-- **KHALTI_PUBLIC_KEY:**"0087382a32f74d909d63f2d7bd17b9a7"
+
 
 
